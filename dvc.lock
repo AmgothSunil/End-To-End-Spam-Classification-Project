@@ -1,0 +1,146 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data_ingestion.py
+    deps:
+    - path: main_data/spam.csv
+      hash: md5
+      md5: 008dcf9ca6aab621d3b3831db6815867
+      size: 503663
+    - path: src/data_ingestion.py
+      hash: md5
+      md5: 455e507730944f0515b52bf80913f674
+      size: 3558
+    params:
+      params.yaml:
+        data_ingestion.random_state: 42
+        data_ingestion.save_dir: ./data
+        data_ingestion.source_data_path: main_data/spam.csv
+        data_ingestion.test_size: 0.2
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: f43e16fdceaa70c0937a1d77f463da27.dir
+      size: 443698
+      nfiles: 2
+  data_preprocessing:
+    cmd: python src/data_preprocessing.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: f43e16fdceaa70c0937a1d77f463da27.dir
+      size: 443698
+      nfiles: 2
+    - path: src/data_preprocessing.py
+      hash: md5
+      md5: 58dc65d272f3eb128d29f580980138ac
+      size: 5263
+    params:
+      params.yaml:
+        data_preprocessing.output_path: ./data/processed
+        data_preprocessing.target_column: label
+        data_preprocessing.test_data_path: ./data/raw/test.csv
+        data_preprocessing.text_column: text
+        data_preprocessing.train_data_path: ./data/raw/train.csv
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: a3e29f8a3cfe108a5cb0f1f707602136.dir
+      size: 273948
+      nfiles: 2
+  feature_engineering:
+    cmd: python src/feature_engineering.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: a3e29f8a3cfe108a5cb0f1f707602136.dir
+      size: 273948
+      nfiles: 2
+    - path: src/feature_engineering.py
+      hash: md5
+      md5: 558484e6d3ae1d532c1566a8acc58521
+      size: 8327
+    params:
+      params.yaml:
+        feature_engineer_params.target_column: label
+        feature_engineer_params.test_data_path: 
+          ./data/processed/test_processed.csv
+        feature_engineer_params.text_column: text
+        feature_engineer_params.train_data_path: 
+          ./data/processed/train_processed.csv
+        feature_engineer_params.word2vec_model_path: ./models/word2vec.model
+        feature_engineer_params.word2vec_params.epochs: 20
+        feature_engineer_params.word2vec_params.min_count: 1
+        feature_engineer_params.word2vec_params.sg: 1
+        feature_engineer_params.word2vec_params.vector_size: 100
+        feature_engineer_params.word2vec_params.window: 5
+        feature_engineer_params.word2vec_params.workers: 4
+        feature_engineer_params.x_test_data_path: ./data/final/x_test.csv
+        feature_engineer_params.x_train_data_path: ./data/final/x_train.csv
+        feature_engineer_params.y_test_data_path: ./data/final/y_test.csv
+        feature_engineer_params.y_train_data_path: ./data/final/y_train.csv
+    outs:
+    - path: data/final
+      hash: md5
+      md5: c015498ff2ad03ad96edc166a109d98a.dir
+      size: 10527241
+      nfiles: 4
+    - path: models/word2vec.model
+      hash: md5
+      md5: 9687c625c82ffcd3c3f5e01d67e1ef32
+      size: 5798165
+  model_building:
+    cmd: python src/model_building.py
+    deps:
+    - path: data/final
+      hash: md5
+      md5: c015498ff2ad03ad96edc166a109d98a.dir
+      size: 10527241
+      nfiles: 4
+    - path: src/model_building.py
+      hash: md5
+      md5: c4b80ded5cd0454da2bbad5c2284256c
+      size: 6022
+    params:
+      params.yaml:
+        model_training.rf_model_path: ./models/rf_model.pkl
+        model_training.rf_params.class_weight: balanced
+        model_training.rf_params.criterion: gini
+        model_training.rf_params.max_depth: 7
+        model_training.rf_params.n_estimators: 100
+        model_training.rf_params.n_jobs: -1
+        model_training.rf_params.random_state: 42
+        model_training.x_train_data_path: ./data/final/x_train.csv
+        model_training.y_train_data_path: ./data/final/y_train.csv
+    outs:
+    - path: models/rf_model.pkl
+      hash: md5
+      md5: 9898d2f39eea058b352a7d303b9d3bb2
+      size: 840260
+  model_evaluation:
+    cmd: python src/model_evaluation.py
+    deps:
+    - path: data/final
+      hash: md5
+      md5: c015498ff2ad03ad96edc166a109d98a.dir
+      size: 10527241
+      nfiles: 4
+    - path: models/rf_model.pkl
+      hash: md5
+      md5: 9898d2f39eea058b352a7d303b9d3bb2
+      size: 840260
+    - path: src/model_evaluation.py
+      hash: md5
+      md5: 5f9ab2f0dcae6576743c65ee6127bb61
+      size: 9849
+    params:
+      params.yaml:
+        model_evaluation.evaluation_metric_path: ./reports/metrics.json
+        model_evaluation.rf_model_path: ./models/rf_model.pkl
+        model_evaluation.x_test_data_path: ./data/final/x_test.csv
+        model_evaluation.y_test_data_path: ./data/final/y_test.csv
+    outs:
+    - path: reports/metrics.json
+      hash: md5
+      md5: 0a060f45625397a1dc66e01492ba8efb
+      size: 186

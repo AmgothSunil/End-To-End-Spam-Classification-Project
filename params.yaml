@@ -56,5 +56,4 @@ model_evaluation:
   y_test_data_path: "./data/final/y_test.csv"
   rf_model_path: "./models/rf_model.pkl"
 
-  evaluation_metric_path: "./evaluation_metrics/metrics.json"
-  
+  evaluation_metric_path: "./reports/metrics.json"

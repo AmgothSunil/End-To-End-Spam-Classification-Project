@@ -6,3 +6,4 @@ nltk
 gensim 
 bs4
 pyyaml
+dvc
