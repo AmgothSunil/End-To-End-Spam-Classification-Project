@@ -1,7 +1,6 @@
 data
 models
 reports
-/main_data/spam.csv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
