@@ -1,0 +1,4 @@
+[core]
+    remote = spamclassification
+['remote "spamclassification"']
+    url = s3://ml-spam-classification

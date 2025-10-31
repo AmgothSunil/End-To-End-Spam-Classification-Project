@@ -8,3 +8,5 @@ bs4
 pyyaml
 dvc
 dvclive
+dvc[s3]
+awscli
