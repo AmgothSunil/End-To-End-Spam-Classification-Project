@@ -2,83 +2,88 @@ stages:
   data_ingestion:
     cmd: python src/data_ingestion.py
     deps:
-      - main_data/spam.csv
-      - src/data_ingestion.py
+    - main_data/spam.csv
+    - src/data_ingestion.py
     params:
-      - data_ingestion.test_size
-      - data_ingestion.random_state
-      - data_ingestion.source_data_path
-      - data_ingestion.save_dir
+    - data_ingestion.test_size
+    - data_ingestion.random_state
+    - data_ingestion.source_data_path
+    - data_ingestion.save_dir
     outs:
-      - data/raw
+    - data/raw
 
   data_preprocessing:
     cmd: python src/data_preprocessing.py
     deps:
-      - data/raw
-      - src/data_preprocessing.py
+    - data/raw
+    - src/data_preprocessing.py
     params:
-      - data_preprocessing.text_column
-      - data_preprocessing.target_column
-      - data_preprocessing.train_data_path
-      - data_preprocessing.test_data_path
-      - data_preprocessing.output_path
+    - data_preprocessing.text_column
+    - data_preprocessing.target_column
+    - data_preprocessing.train_data_path
+    - data_preprocessing.test_data_path
+    - data_preprocessing.output_path
     outs:
-      - data/processed
+    - data/processed
 
   feature_engineering:
     cmd: python src/feature_engineering.py
     deps:
-      - data/processed
-      - src/feature_engineering.py
+    - data/processed
+    - src/feature_engineering.py
     params:
-      - feature_engineer_params.text_column
-      - feature_engineer_params.target_column
-      - feature_engineer_params.train_data_path
-      - feature_engineer_params.test_data_path
-      - feature_engineer_params.x_train_data_path
-      - feature_engineer_params.x_test_data_path
-      - feature_engineer_params.y_train_data_path
-      - feature_engineer_params.y_test_data_path
-      - feature_engineer_params.word2vec_model_path
-      - feature_engineer_params.word2vec_params.vector_size
-      - feature_engineer_params.word2vec_params.min_count
-      - feature_engineer_params.word2vec_params.window
-      - feature_engineer_params.word2vec_params.workers
-      - feature_engineer_params.word2vec_params.sg
-      - feature_engineer_params.word2vec_params.epochs
+    - feature_engineer_params.text_column
+    - feature_engineer_params.target_column
+    - feature_engineer_params.train_data_path
+    - feature_engineer_params.test_data_path
+    - feature_engineer_params.x_train_data_path
+    - feature_engineer_params.x_test_data_path
+    - feature_engineer_params.y_train_data_path
+    - feature_engineer_params.y_test_data_path
+    - feature_engineer_params.word2vec_model_path
+    - feature_engineer_params.word2vec_params.vector_size
+    - feature_engineer_params.word2vec_params.min_count
+    - feature_engineer_params.word2vec_params.window
+    - feature_engineer_params.word2vec_params.workers
+    - feature_engineer_params.word2vec_params.sg
+    - feature_engineer_params.word2vec_params.epochs
     outs:
-      - data/final
-      - models/word2vec.model
+    - data/final
+    - models/word2vec.model
 
   model_building:
     cmd: python src/model_building.py
     deps:
-      - data/final
-      - src/model_building.py
+    - data/final
+    - src/model_building.py
     params:
-      - model_training.x_train_data_path
-      - model_training.y_train_data_path
-      - model_training.rf_model_path
-      - model_training.rf_params.n_estimators
-      - model_training.rf_params.max_depth
-      - model_training.rf_params.criterion
-      - model_training.rf_params.class_weight
-      - model_training.rf_params.n_jobs
-      - model_training.rf_params.random_state
+    - model_training.x_train_data_path
+    - model_training.y_train_data_path
+    - model_training.rf_model_path
+    - model_training.rf_params.n_estimators
+    - model_training.rf_params.max_depth
+    - model_training.rf_params.criterion
+    - model_training.rf_params.class_weight
+    - model_training.rf_params.n_jobs
+    - model_training.rf_params.random_state
     outs:
-      - models/rf_model.pkl
+    - models/rf_model.pkl
 
   model_evaluation:
     cmd: python src/model_evaluation.py
     deps:
-      - data/final
-      - models/rf_model.pkl
-      - src/model_evaluation.py
+    - data/final
+    - models/rf_model.pkl
+    - src/model_evaluation.py
     params:
-      - model_evaluation.x_test_data_path
-      - model_evaluation.y_test_data_path
-      - model_evaluation.rf_model_path
-      - model_evaluation.evaluation_metric_path
+    - model_evaluation.x_test_data_path
+    - model_evaluation.y_test_data_path
+    - model_evaluation.rf_model_path
+    - model_evaluation.evaluation_metric_path
     outs:
-      - reports/metrics.json
+    - reports/metrics.json
+metrics:
+- dvclive/metrics.json
+plots:
+- dvclive/plots/metrics:
+    x: step

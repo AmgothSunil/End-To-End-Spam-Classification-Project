@@ -4,6 +4,8 @@ import logging
 import pickle
 import numpy as np
 import pandas as pd
+import yaml
+from dvclive import Live
 
 from config import load_params
 from sklearn.ensemble import RandomForestClassifier
@@ -260,6 +262,25 @@ def main():
         # Step 2: Evaluate model
         logger.info("Step 2/3: Evaluating model performance...")
         evaluation_metrics = evaluate_model(x_test_data, y_test_data, model)
+
+        # # predict for dvc live
+        # y_pred_data = model.predict(x_test_data)
+        # y_pred_prob = model.predict_proba(x_test_data)[:, 1]
+
+        # # experiment tracking using dvclive
+        # with Live(save_dvc_exp=True) as live:
+        #     live.log_metric('accuracy', accuracy_score(y_test_data, y_pred_data))
+        #     live.log_metric('precision', precision_score(y_test_data, y_pred_data))
+        #     live.log_metric('recall', recall_score(y_test_data, y_pred_data))
+        #     live.log_metric('f1_score', f1_score(y_test_data, y_pred_data))
+        #     live.log_metric('roc_auc_score', roc_auc_score(y_test_data, y_pred_prob))
+
+        #     live.log_params(model_eval_params)
+
+        # experiment tracking using dvclive
+        with Live(save_dvc_exp=True) as live:
+            for metric_name, metric_value in evaluation_metrics.items():
+                live.log_metric(metric_name, metric_value)
         
         # Step 3: Save evaluation metrics
         logger.info("Step 3/3: Saving evaluation metrics...")
