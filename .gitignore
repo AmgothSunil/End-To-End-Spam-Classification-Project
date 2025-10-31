@@ -1,6 +1,7 @@
 data
 models
 reports
+main_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
